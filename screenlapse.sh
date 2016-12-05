@@ -76,7 +76,6 @@ fi
 # fi
 
 STARTNUMBER=1
-printf "\n** STARTNUMBER: $STARTNUMBER **"
 
 read -p "Please enter a framerate (12): " FRAMERATE
 if [ "$FRAMERATE" = "" ] ; then
@@ -93,10 +92,7 @@ if [ -d "$BASE/$FILENAME" ]; then
 	cd "$BASE/$FILENAME"
 	# find the highest-numbered jpg file without letters in its filename
 	STARTNUMBER=$(find . -iname '*.jpg' -or -iname '*.JPEG' -maxdepth 1 | cut -c3- | awk '{print tolower($0)}' | grep -E '[:alpha:]+.*\.(jpg|jpeg)$' -v | sed -E 's/\.(jpg|jpeg)$//g' | sort -nr | head -n1)
-	printf "\n** STARTNUMBER: $STARTNUMBER **"
 	let STARTNUMBER++
-	printf "\n** let STARTNUMBER++: $STARTNUMBER **"
-	printf "\n** $FILENAME screenlapse already exists, resuming at frame $STARTNUMBER **"
 else
 	mkdir "$BASE/$FILENAME"
 	cd "$BASE/$FILENAME"
