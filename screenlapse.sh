@@ -55,13 +55,15 @@ control_c()
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
 
+# TODO only prompt for param input if no filename as argument
 if [ -z "$1" ]; then
 	read -p "Please enter a filename (Default: timelapse): " FILENAME
 	if [ "$FILENAME" = "" ] ; then
 		FILENAME=timelapse
 	fi
 else
-	FILENAME=$1
+	# replace tricky chars in filename arg
+	FILENAME=$(sed -e 's/[^A-Za-z0-9._-]/_/g' <<< $1)
 fi
 FILENAME=$(date '+%Y-%m-%d')_$FILENAME
 
