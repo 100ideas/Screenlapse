@@ -33,11 +33,11 @@ Options
 
 If you're in a hurry, just smash the enter key three times to start recording with defaults, otherwise, you can set these parameters:
 * __Filename__: The name of the `.mov` file and subfolder in which screencap images are saved. Default is `timelapse`. The date is prepended to the name.
+  * __example__: `$ screenlapse bash-sed-hacking` saves screenshots to `$HOME/Pictures/screenlapse/<YYYY-MM-DD>_bash-sed-hacking/`, starting with `0.jpg`. If the directory already exists, it scans for the highest `<int>.jpg` file present and uses `<int+1>.jpg`.
+  * __caveat__: only true if script is run on the __same day__, otherwise new folder is created.
 * __Interval__: number of seconds between each screenshot. Default is 4.
-* __Starting value for incremental numbering__: if you exited the script before and want to resume now, put the name of the last screenshot +1 here (if your last screenshot was 2214.jpg, enter 2215 here). Default is 1.
-  * #TODO add logic that does this automatically if the directory exists
 * __Target width__: Whatever you want the width if the resulting images/video to be, i.e "640". Correct aspect ratio is maintained. Defaults to your screen resolution.
 * __Framerate__: Target framerate of the .mov. Default is 12.
 * #TODO follow the unix way, make these command line args
 
-The root path in which screenlapses are saved is `$HOME/Pictures/screenlapse`. Change this in the script to suit your needs. 
+The root path in which screenlapses are saved is `$HOME/Pictures/screenlapse`. Change this in the script to suit your needs.

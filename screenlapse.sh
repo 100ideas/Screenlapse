@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# records timelapse of desktop. frames and movie saved in ~/Movies/screenlapse
+#
 # repo: https://github.com/100ideas/screenlapse
 # forked from https://github.com/espy/Screenlapse
 #
@@ -10,6 +12,9 @@
 #
 # Set width to 1280, and height will automatically be calculated to preserve the aspect ratio, and the height will be divisible by 2:
 # -vf scale=1280:-2
+#
+# printf format spec http://www.pixelbeat.org/programming/gcc/format_specs.html
+#   ffmpeg apparently uses it (see -i %d param argument)?
 
 renderFilm()
 {
@@ -25,6 +30,7 @@ fi
 control_c()
 # run if user hits control-c
 {
+	RECORDING=false; # break main WHILE loop in case of unexpected program error
 	printf "\n\nScreen recording stopped."
 	printf "Saved $TOTALSHOTS screenshots."
 	FILM12FPS=$(($TOTALSHOTS / 12))
@@ -42,13 +48,12 @@ control_c()
 		(renderFilm)
 		mv "$FILENAME.mov" ../
 		open "../$FILENAME.mov"
+		printf "\n\ndone... movie saved to $BASE/$FILENAME.mov\n"
  	exit $?
 }
 
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
-
-printf "saves screenshots, makes screenlapse in ~/Movies/screenlapse\n\n"
 
 if [ -z "$1" ]; then
 	read -p "Please enter a filename (Default: timelapse): " FILENAME
@@ -65,10 +70,13 @@ if [ "$INTERVAL" = "" ] ; then
 	INTERVAL=4
 fi
 
-read -p "Enter start value for file numbering (Default: 1)" STARTNUMBER
-if [ "$STARTNUMBER" = "" ] ; then
-	STARTNUMBER=1
-fi
+# read -p "Enter start value for file numbering (Default: 1)" STARTNUMBER
+# if [ "$STARTNUMBER" = "" ] ; then
+# 	STARTNUMBER=1
+# fi
+
+STARTNUMBER=1
+printf "\n** STARTNUMBER: $STARTNUMBER **"
 
 read -p "Please enter a framerate (12): " FRAMERATE
 if [ "$FRAMERATE" = "" ] ; then
@@ -77,20 +85,30 @@ fi
 
 read -p "Optional: resize movie width to (1280? 720?):" TARGETWIDTH
 
-printf "Now taking screenshots every $INTERVAL seconds, starting at $STARTNUMBER.jpg."
-TOTALSHOTS=0
-here="$HOME/Movies/screenlapse"
-if [ -d "$here/$FILENAME" ]; then
-	FILENAME="$FILENAME"_$(date '+%H%M%S')
+printf "RECORDING: screenshots $INTERVAL seconds, starting at $STARTNUMBER.jpg."
+
+BASE="$HOME/Movies/screenlapse"
+if [ -d "$BASE/$FILENAME" ]; then
+
+	cd "$BASE/$FILENAME"
+	# find the highest-numbered jpg file without letters in its filename
+	STARTNUMBER=$(find . -iname '*.jpg' -or -iname '*.JPEG' -maxdepth 1 | cut -c3- | awk '{print tolower($0)}' | grep -E '[:alpha:]+.*\.(jpg|jpeg)$' -v | sed -E 's/\.(jpg|jpeg)$//g' | sort -nr | head -n1)
+	printf "\n** STARTNUMBER: $STARTNUMBER **"
+	let STARTNUMBER++
+	printf "\n** let STARTNUMBER++: $STARTNUMBER **"
+	printf "\n** $FILENAME screenlapse already exists, resuming at frame $STARTNUMBER **"
+else
+	mkdir "$BASE/$FILENAME"
+	cd "$BASE/$FILENAME"
 fi
-here=$here/$FILENAME
 
-mkdir "$here"
-cd "$here"
-printf "\nScreenshots will be saved to $here\n"
 
-i=$STARTNUMBER;
-while true; do
+printf "\nScreenshots will be saved to $BASE/$FILENAME\n"
+
+i=$STARTNUMBER
+TOTALSHOTS=0
+RECORDING=true
+while [ "$RECORDING" = true ]; do
 	screencapture -t jpg -x $i.jpg;
 	# if [ "$TARGETWIDTH" != "" ] ; then
 	# 	sips $i.jpg --resampleWidth $TARGETWIDTH --out $i.jpg &> /dev/null
