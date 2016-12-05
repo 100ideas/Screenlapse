@@ -1,17 +1,17 @@
 Screenlapse - record timelapse of your desktop
 ===========
 
-Usage: `screenlapse [name]`
+Starting & Stopping
+-------------------
+Start with `$ screenlapse <optional_name>`.
 
-A bash script for os x that makes a timelapse video of your screen with ffmpg, forked from [espy/Screenlapse](https://github.com/espy/Screenlapse)
+Stop with `ctrl-c`.
 
-What it does
-------------
+Pause with `ctrl-z` & `fg` to resume.
 
-* Takes incrementally numbered screenshots of your main monitor at a definable interval, and at a definable resolution.
-* If you have ffmpeg installed, it will let you render these screenshots to a .mov file at an arbitrary framerate.
+A bash script for os x that continuously captures screenshots, then assembles them into a timelapse video with ffmpg. Forked from [espy/Screenlapse](https://github.com/espy/Screenlapse)
 
-How to use it
+Install
 -------------
 
 1. get [homebrew](http://brew.sh) if you don't have it.
@@ -27,8 +27,9 @@ $ chmod +x screenlapse.sh
 function screenlapse; bash "<PATH_TO_SCRIPT>/screenlapse.sh" $argv; end
 ```
 4. alternatively, rename to 'screenlapse.command' and you can double-click in finder to launch (neat idea @espy)
-5.
 
+Options
+-------------
 
 If you're in a hurry, just smash the enter key three times to start recording with defaults, otherwise, you can set these parameters:
 * __Filename__: The name of the `.mov` file and subfolder in which screencap images are saved. Default is `timelapse`. The date is prepended to the name.
@@ -39,4 +40,4 @@ If you're in a hurry, just smash the enter key three times to start recording wi
 * __Framerate__: Target framerate of the .mov. Default is 12.
 * #TODO follow the unix way, make these command line args
 
-You can then stop the screenshotting with `ctrl-c`. Use `ctrl-z` to pause and `fg` to resume.
+The root path in which screenlapses are saved is `$HOME/Pictures/screenlapse`. Change this in the script to suit your needs. 
