@@ -99,14 +99,15 @@ screenlapse [MOVIENAME]
 note: requires FFMPEG to render movies, but not for capture
 more information: https://github.com/100ideas/screenlapse"
 	exit 0;
-	
+
 else
 	# replace invalid chars in filename arg
 	FILENAME=$(sed -e 's/[^A-Za-z0-9._-]/_/g' <<< $1)
 	INTERVAL=4
 	STARTNUMBER=1
 	FRAMERATE=12
-	TARGETWIDTH=""
+	# TARGETWIDTH="" # full res
+	TARGETWIDTH=1920 #1080P HD
 
 fi
 FILENAME=$(date '+%Y-%m-%d')_$FILENAME
@@ -133,7 +134,6 @@ TOTALSHOTS=0
 RECORDING=true
 while [ "$RECORDING" = true ]; do
 	screencapture -t jpg -x $i.jpg;
-	# uncomment to also resize image frames
 	# if [ "$TARGETWIDTH" != "" ] ; then
 	# 	sips $i.jpg --resampleWidth $TARGETWIDTH --out $i.jpg &> /dev/null
 	# fi
