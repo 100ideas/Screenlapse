@@ -30,14 +30,17 @@ function screenlapse; bash "<PATH_TO_SCRIPT>/screenlapse.sh" $argv; end
 
 Options
 -------------
+Uses these defaults if <optional_name> is provided: 
+- screen captured every 4 s
+- movie rendered at 12 fps
+- screenshots and movie resized to 1920x1080
 
-If you're in a hurry, just smash the enter key three times to start recording with defaults, otherwise, you can set these parameters:
+Without an argument, screenlapse prompts for the following parameters (if you're in a hurry, just smash the enter key four times to start recording with defaults as above)
 * __Filename__: The name of the `.mov` file and subfolder in which screencap images are saved. Default is `timelapse`. The date is prepended to the name.
   * __example__: `$ screenlapse bash-sed-hacking` saves screenshots to `$HOME/Pictures/screenlapse/<YYYY-MM-DD>_bash-sed-hacking/`, starting with `0.jpg`. If the directory already exists, it scans for the highest `<int>.jpg` file present and uses `<int+1>.jpg`.
   * __caveat__: only true if script is run on the __same day__, otherwise new folder is created.
 * __Interval__: number of seconds between each screenshot. Default is 4.
 * __Target width__: Whatever you want the width if the resulting images/video to be, i.e "640". Correct aspect ratio is maintained. Defaults to your screen resolution.
 * __Framerate__: Target framerate of the .mov. Default is 12.
-* #TODO follow the unix way, make these command line args
 
 The root path in which screenlapses are saved is `$HOME/Pictures/screenlapse`. Change this in the script to suit your needs.
