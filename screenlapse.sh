@@ -19,7 +19,7 @@
 renderFilm()
 {
 
-if [ "$TARGETWIDTH" = "" ] ; then
+if [ "$TARGETWIDTH" = "" ]; then
 	ffmpeg -r $FRAMERATE -i %d.jpg -b:v 15000k $FILENAME.mov
 else
 	ffmpeg -r $FRAMERATE -i %d.jpg -b:v 15000k -vf scale=$TARGETWIDTH:-2 $FILENAME.mov
@@ -30,6 +30,7 @@ fi
 control_c()
 # run if user hits control-c
 {
+	let TRAPS++; if [[ $TRAPS -gt 1 ]]; then exit 1; fi # break if double ctrl-c
 	RECORDING=false; # break main WHILE loop in case of unexpected program error
 	printf "\n\nScreen recording stopped."
 	printf "Saved $TOTALSHOTS screenshots."
@@ -54,37 +55,61 @@ control_c()
 
 # trap keyboard interrupt (control-c)
 trap control_c SIGINT
+# count number of traps
+TRAPS=0;
 
 # TODO only prompt for param input if no filename as argument
 if [ -z "$1" ]; then
 	read -p "Please enter a filename (Default: timelapse): " FILENAME
-	if [ "$FILENAME" = "" ] ; then
+	if [ "$FILENAME" = "" ]; then
 		FILENAME=timelapse
 	fi
+
+	read -p "Please enter the shooting interval in seconds (Default: 4): " INTERVAL
+	if [ "$INTERVAL" = "" ]; then
+		INTERVAL=4
+	fi
+
+	read -p "Enter start value for file numbering (Default: 1)" STARTNUMBER
+	if [ "$STARTNUMBER" = "" ]; then
+		STARTNUMBER=1
+	fi
+
+	read -p "Please enter a framerate (12): " FRAMERATE
+	# hack to check for non-int input
+	if [[ "$FRAMERATE" = "" ]] || [[ "$FRAMERATE" -lt 0 ]]; then
+		FRAMERATE=12
+	fi
+
+	read -p "Optional: resize movie width to (1280? 720?):" TARGETWIDTH
+	if [[ "$TARGETWIDTH" -lt 0 ]]; then
+		TARGETWIDTH=""
+	fi
+elif [[ "$1" = "-h" ]]; then
+	printf "screenlapse: make timelapse movies of your desktop
+
+screenlapse
+  - prompts user for recording options
+  - outputs to $HOME/Movies/screenlapse/YYYY-MM-DD_screenlapse/
+
+screenlapse [MOVIENAME]
+  - starts immediately with default options
+  - outputs to $HOME/Movies/screenlapse/YYYY-MM-DD_MOVIENAME/
+
+note: requires FFMPEG to render movies, but not for capture
+more information: https://github.com/100ideas/screenlapse"
+	exit 0;
+	
 else
-	# replace tricky chars in filename arg
+	# replace invalid chars in filename arg
 	FILENAME=$(sed -e 's/[^A-Za-z0-9._-]/_/g' <<< $1)
+	INTERVAL=4
+	STARTNUMBER=1
+	FRAMERATE=12
+	TARGETWIDTH=""
+
 fi
 FILENAME=$(date '+%Y-%m-%d')_$FILENAME
-
-read -p "Please enter the shooting interval in seconds (Default: 4): " INTERVAL
-if [ "$INTERVAL" = "" ] ; then
-	INTERVAL=4
-fi
-
-# read -p "Enter start value for file numbering (Default: 1)" STARTNUMBER
-# if [ "$STARTNUMBER" = "" ] ; then
-# 	STARTNUMBER=1
-# fi
-
-STARTNUMBER=1
-
-read -p "Please enter a framerate (12): " FRAMERATE
-if [ "$FRAMERATE" = "" ] ; then
-	FRAMERATE=12
-fi
-
-read -p "Optional: resize movie width to (1280? 720?):" TARGETWIDTH
 
 printf "RECORDING: screenshots $INTERVAL seconds, starting at $STARTNUMBER.jpg."
 
@@ -108,6 +133,7 @@ TOTALSHOTS=0
 RECORDING=true
 while [ "$RECORDING" = true ]; do
 	screencapture -t jpg -x $i.jpg;
+	# uncomment to also resize image frames
 	# if [ "$TARGETWIDTH" != "" ] ; then
 	# 	sips $i.jpg --resampleWidth $TARGETWIDTH --out $i.jpg &> /dev/null
 	# fi
