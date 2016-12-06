@@ -44,3 +44,7 @@ Without an argument, screenlapse prompts for the following parameters (if you're
 * __Framerate__: Target framerate of the .mov. Default is 12.
 
 The root path in which screenlapses are saved is `$HOME/Pictures/screenlapse`. Change this in the script to suit your needs.
+
+License
+---------------
+This fork: MIT
